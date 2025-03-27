@@ -15,5 +15,6 @@ export type GetAllUsersResult = {
 
 export enum GetAllUsersError {
     NO_USERS_FOUND = "NO_USERS_FOUND",
-    UNKNOWN = "UNKNOWN",
+    PAGE_BEYOND_LIMIT = "PAGE_BEYOND_LIMIT",
+    UNKNOWN = "UNKNOWN"
 }
