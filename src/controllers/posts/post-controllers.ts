@@ -107,9 +107,17 @@ export const createPost = async (parameters: {
   
       // Fetch all posts
       const posts = await prisma.post.findMany({
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: "asc" }, 
         skip,
         take: limit,
+        include: {
+          user: {
+            select: {
+              name:true,
+              username: true,
+            },
+          },
+        },
       });
   
       return { posts };
