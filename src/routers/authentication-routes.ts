@@ -7,11 +7,12 @@ export const authenticationRoutes = new Hono();
 
 
 authenticationRoutes.post("/sign-up", async (c) => {
-  const { username, password } = await c.req.json();
+  const { username, password, name } = await c.req.json();
   try {
     const result = await signUpWithUsernameAndPassword({
       username,
       password,
+      name
     });
 
     return c.json({ data: result }, 200);

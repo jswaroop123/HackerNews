@@ -36,6 +36,7 @@ const createJWToken = (parameters: {
 export const signUpWithUsernameAndPassword = async (parameters: {
   username: string;
   password: string;
+  name: string;
 }): Promise<SignUpWithUsernameAndPasswordResult> => {
   try {
     const existingUser = await prisma.user.findUnique({
@@ -56,7 +57,7 @@ export const signUpWithUsernameAndPassword = async (parameters: {
       data: {
         username: parameters.username,
         password: hashedPassword,
-        name: ""
+        name: parameters.name
       },
     });
 
