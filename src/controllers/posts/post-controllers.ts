@@ -131,3 +131,35 @@ export const createPost = async (parameters: {
   };
   
 
+
+export const deletePost = async (params: {
+  postId: string;
+  userId: string;
+}): Promise<DeletePostError> => {
+  try {
+    // Check if the post belongs to the user
+    const post = await prisma.post.findUnique({
+      where: { id: params.postId },
+    });
+
+    if (!post) {
+      return DeletePostError.POST_NOT_FOUND;
+    }
+
+    if (post.userId !== params.userId) {
+      return DeletePostError.UNAUTHORIZED;
+    }
+
+    await prisma.post.delete({
+      where: { id: params.postId },
+    });
+
+    return DeletePostError.DELETE_SUCCESS;
+  } catch (error) {
+    console.error(error);
+    return DeletePostError.DELETE_FAILED;
+  }
+};
+
+
+

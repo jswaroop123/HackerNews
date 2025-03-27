@@ -9,7 +9,7 @@ import {
 } from "../controllers/posts/post-types";
 
 import { getPagination } from "../extras/pagination";
-import {GetAllPostsForUser, GetAllPosts} from "../controllers/posts/post-controllers"
+import {GetAllPostsForUser, GetAllPosts, deletePost} from "../controllers/posts/post-controllers"
 
 export const postsRoutes = new Hono();
 postsRoutes.post("/create", tokenMiddleware, async (context) => {
@@ -89,3 +89,36 @@ postsRoutes.get("/all", async (context) => {
     return context.json({ error: "Unknown error" }, 500);
   }
 });
+
+postsRoutes.delete("/:id", tokenMiddleware, async (context) => {
+  try {
+    const userId = context.get("userId"); // Extracted from tokenMiddleware
+    const postId = context.req.param("id");
+
+    if (!userId) {
+      return context.json({ error: "Unauthorized" }, 401);
+    }
+
+    const result = await deletePost({ postId, userId });
+
+    // Handle errors based on DeletePostError enum
+    if (result === DeletePostError.POST_NOT_FOUND) {
+      return context.json({ error: "Post not found" }, 404);
+    }
+
+    if (result === DeletePostError.UNAUTHORIZED) {
+      return context.json({ error: "You are not allowed to delete this post" }, 403);
+    }
+
+    if (result === DeletePostError.DELETE_FAILED) {
+      return context.json({ error: "Failed to delete post" }, 500);
+    }
+
+    return context.json({ message: "Post deleted successfully" }, 200);
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    return context.json({ error: "Internal server error" }, 500);
+  }
+});
+
+
