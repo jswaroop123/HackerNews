@@ -35,4 +35,5 @@ export enum DeleteLikeError {
     DELETE_SUCCESS = "DELETE_SUCCESS",
     DELETE_FAILED = "DELETE_FAILED",
     UNKNOWN = "UNKNOWN",
+    POST_NOT_FOUND = "POST_NOT_FOUND"
 }
