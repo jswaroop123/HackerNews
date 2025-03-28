@@ -3,7 +3,7 @@ import { tokenMiddleware } from "./middleware/token-middleware";
 import {
   GetComments,
   CreateComment,
-  //DeleteComment,
+  DeleteComment,
   UpdateComment,
 } from "../controllers/comments/comment-controller";
 import {
@@ -78,6 +78,23 @@ commentsRoutes.get("/on/:postId", tokenMiddleware, async (c) => {
         );
       }
       return c.json({ error: "Unknown error" }, 500);
+    }
+  });
+
+  commentsRoutes.delete("/:commentId", tokenMiddleware, async (c) => {
+    try {
+      const commentId = c.req.param("commentId");
+      const userId = c.get("userId");
+      await DeleteComment({ commentId, userId });
+      return c.json({ message: "Comment deleted successfully" }, 200);
+    } catch (error) {
+      if (error === DeleteCommentError.COMMENT_NOT_FOUND) {
+        return c.json({ error: "Comment not found" }, 404);
+      }
+      if (error === DeleteCommentError.UNAUTHORIZED) {
+        return c.json({ error: "You can only delete your own comments" }, 403);
+      }
+      return c.json({ error: "Unknown error" },500);
     }
   });
   

@@ -181,4 +181,37 @@ export const GetComments = async (parameters: {
       throw UpdateCommentError.UNKNOWN;
     }
   };
+
+  export const DeleteComment = async (parameters: {
+    commentId: string;
+    userId: string;
+  }): Promise<void> => {
+    try {
+      const { commentId, userId } = parameters;
   
+      const comment = await prisma.comment.findUnique({
+        where: { id: commentId },
+      });
+  
+      if (!comment) {
+        throw DeleteCommentError.COMMENT_NOT_FOUND;
+      }
+  
+      if (comment.userId !== userId) {
+        throw DeleteCommentError.UNAUTHORIZED;
+      }
+  
+      await prisma.comment.delete({
+        where: { id: commentId },
+      });
+    } catch (e) {
+      console.error(e);
+      if (
+        e === DeleteCommentError.COMMENT_NOT_FOUND ||
+        e === DeleteCommentError.UNAUTHORIZED
+      ) {
+        throw e;
+      }
+      throw DeleteCommentError.UNKNOWN;
+    }
+  };
