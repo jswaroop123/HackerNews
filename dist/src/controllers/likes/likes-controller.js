@@ -1,29 +1,33 @@
-import { prisma } from "../../extras/prisma";
-import { LikeStatus, DeleteLikeError } from "./like-types";
-export const createLike = async (postId, userId) => {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.deleteLike = exports.getLikes = exports.createLike = void 0;
+const prisma_1 = require("../../extras/prisma");
+const like_types_1 = require("./like-types");
+const createLike = async (postId, userId) => {
     try {
-        const post = await prisma.post.findUnique({ where: { id: postId } });
+        const post = await prisma_1.prisma.post.findUnique({ where: { id: postId } });
         if (!post) {
-            return { status: LikeStatus.POST_NOT_FOUND };
+            return { status: like_types_1.LikeStatus.POST_NOT_FOUND };
         }
-        const existingLike = await prisma.like.findFirst({
+        const existingLike = await prisma_1.prisma.like.findFirst({
             where: { userId, postId }, // Finds if the user has already liked the post
         });
         if (existingLike) {
-            return { status: LikeStatus.ALREADY_LIKED };
+            return { status: like_types_1.LikeStatus.ALREADY_LIKED };
         }
-        await prisma.like.create({ data: { userId, postId } });
-        return { status: LikeStatus.LIKE_SUCCESS };
+        await prisma_1.prisma.like.create({ data: { userId, postId } });
+        return { status: like_types_1.LikeStatus.LIKE_SUCCESS };
     }
     catch (error) {
         console.error(error);
-        return { status: LikeStatus.UNKNOWN };
+        return { status: like_types_1.LikeStatus.UNKNOWN };
     }
 };
-export const getLikes = async (params) => {
+exports.createLike = createLike;
+const getLikes = async (params) => {
     try {
         const { postId, page, limit } = params;
-        const likes = await prisma.like.findMany({
+        const likes = await prisma_1.prisma.like.findMany({
             where: { postId },
             orderBy: { createdAt: "desc" }, // Reverse chronological order
             skip: (page - 1) * limit,
@@ -41,39 +45,41 @@ export const getLikes = async (params) => {
             },
         });
         if (!likes.length) {
-            return { status: LikeStatus.NO_LIKES_FOUND };
+            return { status: like_types_1.LikeStatus.NO_LIKES_FOUND };
         }
         return { likes };
     }
     catch (error) {
         console.error(error);
-        throw LikeStatus.UNKNOWN;
+        throw like_types_1.LikeStatus.UNKNOWN;
     }
     ;
 };
-export const deleteLike = async (params) => {
+exports.getLikes = getLikes;
+const deleteLike = async (params) => {
     try {
         const { postId, userId } = params;
-        const like = await prisma.like.findFirst({
+        const like = await prisma_1.prisma.like.findFirst({
             where: { postId, userId },
         });
-        const postExists = await prisma.post.findUnique({
+        const postExists = await prisma_1.prisma.post.findUnique({
             where: { id: postId },
             select: { id: true }, // Only fetch the ID to reduce query load
         });
         if (!postExists) {
-            return { status: DeleteLikeError.POST_NOT_FOUND };
+            return { status: like_types_1.DeleteLikeError.POST_NOT_FOUND };
         }
         if (!like) {
-            return { status: DeleteLikeError.LIKE_NOT_FOUND };
+            return { status: like_types_1.DeleteLikeError.LIKE_NOT_FOUND };
         }
-        await prisma.like.delete({
+        await prisma_1.prisma.like.delete({
             where: { id: like.id },
         });
-        return { status: DeleteLikeError.DELETE_SUCCESS };
+        return { status: like_types_1.DeleteLikeError.DELETE_SUCCESS };
     }
     catch (error) {
         console.error(error);
-        return { status: DeleteLikeError.DELETE_FAILED };
+        return { status: like_types_1.DeleteLikeError.DELETE_FAILED };
     }
 };
+exports.deleteLike = deleteLike;

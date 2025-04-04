@@ -1,29 +1,21 @@
-# Use Node.js official image
 FROM node:22.1.0
 
-# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json first
-COPY package.json package-lock.json ./
+# Copy only needed files
+COPY package*.json ./
+COPY tsconfig*.json ./
+COPY src ./src
 
-# Install dependencies (including TypeScript & Prisma)
-RUN npm install && npm install --save-dev @types/jsonwebtoken @prisma/client
+# Copy Prisma folder only if it exists by copying everything, relying on .dockerignore
+COPY . .
 
-# Copy the rest of the application files
-COPY . .z
+RUN npm install
 
-# Ensure `dist/` directory exists
-RUN mkdir -p dist
+RUN if [ -f "./prisma/schema.prisma" ]; then npx prisma generate; else echo "Skipping prisma generate"; fi
 
-# Generate Prisma client if schema exists
-RUN test -f "./prisma/schema.prisma" && npx prisma generate || echo "No Prisma schema found"
-
-# Build the project (TypeScript -> JavaScript)
 RUN npm run build
 
-# Expose the application port
 EXPOSE 3000
 
-# Start the application
-CMD ["node", "dist/index.js"]
+CMD ["npm", "start"]

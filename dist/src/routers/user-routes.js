@@ -1,23 +1,26 @@
-import { Hono } from "hono";
-import { tokenMiddleware } from "./middleware/token-middleware";
-import { GetAllUsers, GetMe } from "../controllers/users/user-controllers";
-import { GetAllUsersError, GetMeError } from "../controllers/users/user-types";
-import { getPagination } from "../extras/pagination";
-export const usersRoutes = new Hono();
-usersRoutes.get("/me", tokenMiddleware, async (context) => {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.usersRoutes = void 0;
+const hono_1 = require("hono");
+const token_middleware_1 = require("./middleware/token-middleware");
+const user_controllers_1 = require("../controllers/users/user-controllers");
+const user_types_1 = require("../controllers/users/user-types");
+const pagination_1 = require("../extras/pagination");
+exports.usersRoutes = new hono_1.Hono();
+exports.usersRoutes.get("/me", token_middleware_1.tokenMiddleware, async (context) => {
     try {
         const userId = context.get("userId");
-        const result = await GetMe({ userId });
+        const result = await (0, user_controllers_1.GetMe)({ userId });
         if (!result) {
             return context.json({ error: "User not found" }, 404);
         }
         return context.json(result, 200);
     }
     catch (error) {
-        if (error === GetMeError.USER_NOT_FOUND) {
+        if (error === user_types_1.GetMeError.USER_NOT_FOUND) {
             return context.json({ error: "User not found" }, 404);
         }
-        if (error === GetMeError.UNKNOWN) {
+        if (error === user_types_1.GetMeError.UNKNOWN) {
             return context.json({ error: "Unknown error" }, 500);
         }
     }
@@ -39,23 +42,23 @@ usersRoutes.get("/me", tokenMiddleware, async (context) => {
 //   }
 // });
 //user-routes.ts
-usersRoutes.get("/", tokenMiddleware, async (context) => {
+exports.usersRoutes.get("/", token_middleware_1.tokenMiddleware, async (context) => {
     try {
-        const { page, limit } = getPagination(context);
-        const result = await GetAllUsers({ page, limit });
+        const { page, limit } = (0, pagination_1.getPagination)(context);
+        const result = await (0, user_controllers_1.GetAllUsers)({ page, limit });
         if (!result) {
             return context.json({ error: "No users found" }, 404);
         }
         return context.json(result, 200);
     }
     catch (error) {
-        if (error === GetAllUsersError.NO_USERS_FOUND) {
+        if (error === user_types_1.GetAllUsersError.NO_USERS_FOUND) {
             return context.json({ error: "No users found" }, 404);
         }
-        if (error === GetAllUsersError.PAGE_BEYOND_LIMIT) {
+        if (error === user_types_1.GetAllUsersError.PAGE_BEYOND_LIMIT) {
             return context.json({ error: "No users found on the page requested]" }, 404);
         }
-        if (error === GetAllUsersError.UNKNOWN) {
+        if (error === user_types_1.GetAllUsersError.UNKNOWN) {
             return context.json({ error: "Unknown error" }, 500);
         }
     }

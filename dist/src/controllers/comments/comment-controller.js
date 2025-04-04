@@ -1,18 +1,21 @@
-import { prisma } from "../../extras/prisma";
-import { GetCommentsError, CreateCommentError, DeleteCommentError, UpdateCommentError, } from "./comment-type";
-export const CreateComment = async (parameters) => {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.DeleteComment = exports.UpdateComment = exports.GetComments = exports.CreateComment = void 0;
+const prisma_1 = require("../../extras/prisma");
+const comment_type_1 = require("./comment-type");
+const CreateComment = async (parameters) => {
     try {
         const { postId, userId, content } = parameters;
         if (!content.trim()) {
-            throw CreateCommentError.INVALID_INPUT;
+            throw comment_type_1.CreateCommentError.INVALID_INPUT;
         }
-        const post = await prisma.post.findUnique({
+        const post = await prisma_1.prisma.post.findUnique({
             where: { id: postId },
         });
         if (!post) {
-            throw CreateCommentError.POST_NOT_FOUND;
+            throw comment_type_1.CreateCommentError.POST_NOT_FOUND;
         }
-        const comment = await prisma.comment.create({
+        const comment = await prisma_1.prisma.comment.create({
             data: {
                 content,
                 postId,
@@ -31,37 +34,38 @@ export const CreateComment = async (parameters) => {
     }
     catch (e) {
         console.error(e);
-        if (e === CreateCommentError.POST_NOT_FOUND ||
-            e === CreateCommentError.INVALID_INPUT) {
+        if (e === comment_type_1.CreateCommentError.POST_NOT_FOUND ||
+            e === comment_type_1.CreateCommentError.INVALID_INPUT) {
             throw e;
         }
-        throw CreateCommentError.UNKNOWN;
+        throw comment_type_1.CreateCommentError.UNKNOWN;
     }
 };
-export const GetComments = async (parameters) => {
+exports.CreateComment = CreateComment;
+const GetComments = async (parameters) => {
     try {
         const { postId, page, limit } = parameters;
         if (page < 1 || limit < 1) {
-            throw GetCommentsError.PAGE_BEYOND_LIMIT;
+            throw comment_type_1.GetCommentsError.PAGE_BEYOND_LIMIT;
         }
         const skip = (page - 1) * limit;
-        const post = await prisma.post.findUnique({
+        const post = await prisma_1.prisma.post.findUnique({
             where: { id: postId },
         });
         if (!post) {
-            throw GetCommentsError.POST_NOT_FOUND;
+            throw comment_type_1.GetCommentsError.POST_NOT_FOUND;
         }
-        const totalComments = await prisma.comment.count({
+        const totalComments = await prisma_1.prisma.comment.count({
             where: { postId },
         });
         if (totalComments === 0) {
-            throw GetCommentsError.COMMENTS_NOT_FOUND;
+            throw comment_type_1.GetCommentsError.COMMENTS_NOT_FOUND;
         }
         const totalPages = Math.ceil(totalComments / limit);
         if (page > totalPages) {
-            throw GetCommentsError.PAGE_BEYOND_LIMIT;
+            throw comment_type_1.GetCommentsError.PAGE_BEYOND_LIMIT;
         }
-        const comments = await prisma.comment.findMany({
+        const comments = await prisma_1.prisma.comment.findMany({
             where: { postId },
             orderBy: { createdAt: "desc" },
             skip,
@@ -79,34 +83,35 @@ export const GetComments = async (parameters) => {
     }
     catch (e) {
         console.error(e);
-        if (e === GetCommentsError.POST_NOT_FOUND ||
-            e === GetCommentsError.COMMENTS_NOT_FOUND ||
-            e === GetCommentsError.PAGE_BEYOND_LIMIT) {
+        if (e === comment_type_1.GetCommentsError.POST_NOT_FOUND ||
+            e === comment_type_1.GetCommentsError.COMMENTS_NOT_FOUND ||
+            e === comment_type_1.GetCommentsError.PAGE_BEYOND_LIMIT) {
             throw e;
         }
-        throw GetCommentsError.UNKNOWN;
+        throw comment_type_1.GetCommentsError.UNKNOWN;
     }
 };
-export const UpdateComment = async (parameters) => {
+exports.GetComments = GetComments;
+const UpdateComment = async (parameters) => {
     try {
         const { commentId, userId, content } = parameters;
         if (!content.trim()) {
-            throw UpdateCommentError.INVALID_INPUT;
+            throw comment_type_1.UpdateCommentError.INVALID_INPUT;
         }
-        const existingComment = await prisma.comment.findUnique({
+        const existingComment = await prisma_1.prisma.comment.findUnique({
             where: { id: commentId },
         });
         if (!existingComment) {
-            throw UpdateCommentError.COMMENT_NOT_FOUND;
+            throw comment_type_1.UpdateCommentError.COMMENT_NOT_FOUND;
         }
         if (existingComment.userId !== userId) {
-            throw UpdateCommentError.UNAUTHORIZED;
+            throw comment_type_1.UpdateCommentError.UNAUTHORIZED;
         }
         if (existingComment.content.toLowerCase().trim() ===
             content.toLowerCase().trim()) {
-            throw UpdateCommentError.NO_CHANGES;
+            throw comment_type_1.UpdateCommentError.NO_CHANGES;
         }
-        const comment = await prisma.comment.update({
+        const comment = await prisma_1.prisma.comment.update({
             where: { id: commentId },
             data: { content },
             include: {
@@ -122,37 +127,39 @@ export const UpdateComment = async (parameters) => {
     }
     catch (e) {
         console.error(e);
-        if (e === UpdateCommentError.COMMENT_NOT_FOUND ||
-            e === UpdateCommentError.INVALID_INPUT ||
-            e === UpdateCommentError.NO_CHANGES ||
-            e === UpdateCommentError.UNAUTHORIZED) {
+        if (e === comment_type_1.UpdateCommentError.COMMENT_NOT_FOUND ||
+            e === comment_type_1.UpdateCommentError.INVALID_INPUT ||
+            e === comment_type_1.UpdateCommentError.NO_CHANGES ||
+            e === comment_type_1.UpdateCommentError.UNAUTHORIZED) {
             throw e;
         }
-        throw UpdateCommentError.UNKNOWN;
+        throw comment_type_1.UpdateCommentError.UNKNOWN;
     }
 };
-export const DeleteComment = async (parameters) => {
+exports.UpdateComment = UpdateComment;
+const DeleteComment = async (parameters) => {
     try {
         const { commentId, userId } = parameters;
-        const comment = await prisma.comment.findUnique({
+        const comment = await prisma_1.prisma.comment.findUnique({
             where: { id: commentId },
         });
         if (!comment) {
-            throw DeleteCommentError.COMMENT_NOT_FOUND;
+            throw comment_type_1.DeleteCommentError.COMMENT_NOT_FOUND;
         }
         if (comment.userId !== userId) {
-            throw DeleteCommentError.UNAUTHORIZED;
+            throw comment_type_1.DeleteCommentError.UNAUTHORIZED;
         }
-        await prisma.comment.delete({
+        await prisma_1.prisma.comment.delete({
             where: { id: commentId },
         });
     }
     catch (e) {
         console.error(e);
-        if (e === DeleteCommentError.COMMENT_NOT_FOUND ||
-            e === DeleteCommentError.UNAUTHORIZED) {
+        if (e === comment_type_1.DeleteCommentError.COMMENT_NOT_FOUND ||
+            e === comment_type_1.DeleteCommentError.UNAUTHORIZED) {
             throw e;
         }
-        throw DeleteCommentError.UNKNOWN;
+        throw comment_type_1.DeleteCommentError.UNKNOWN;
     }
 };
+exports.DeleteComment = DeleteComment;

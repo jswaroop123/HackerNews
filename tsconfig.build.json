@@ -11,3 +11,4 @@
   },
   "include": ["src"]
 }
+//docker run -d -e KEY=bootcamp -e DATABASE_URL="postgresql://postgres.pqgivvyyqfotwdgjaetk:swaroop2003%40@aws-0-ap-south-1.pooler.supabase.com:6543/postgres?pgbouncer=true" -e DIRECT_URL="postgresql://postgres.pqgivvyyqfotwdgjaetk:swaroop2003%40@aws-0-ap-south-1.pooler.supabase.com:5432/postgres" -p 3000:3000 hackernews

@@ -1,12 +1,14 @@
-import { getPagination } from "../../extras/pagination";
-import { prisma } from "../../extras/prisma";
-import { DeletePostError, GetPostsError, PostStatus, } from "./post-types";
-export const createPost = async (parameters) => {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.deletePost = exports.GetAllPosts = exports.GetAllPostsForUser = exports.createPost = void 0;
+const prisma_1 = require("../../extras/prisma");
+const post_types_1 = require("./post-types");
+const createPost = async (parameters) => {
     try {
         if (!parameters.authorId) {
-            return PostStatus.USER_NOT_FOUND;
+            return post_types_1.PostStatus.USER_NOT_FOUND;
         }
-        const post = await prisma.post.create({
+        const post = await prisma_1.prisma.post.create({
             data: {
                 title: parameters.title,
                 content: parameters.content,
@@ -21,29 +23,30 @@ export const createPost = async (parameters) => {
     }
     catch (error) {
         console.error(error);
-        return PostStatus.POST_CREATION_FAILED;
+        return post_types_1.PostStatus.POST_CREATION_FAILED;
     }
 };
-export const GetAllPostsForUser = async (parameter) => {
+exports.createPost = createPost;
+const GetAllPostsForUser = async (parameter) => {
     try {
         const { userId, page, limit } = parameter;
         const skip = (page - 1) * limit;
-        const userExists = await prisma.user.findUnique({ where: { id: userId } });
+        const userExists = await prisma_1.prisma.user.findUnique({ where: { id: userId } });
         if (!userExists) {
-            throw GetPostsError.USER_NOT_FOUND;
+            throw post_types_1.GetPostsError.USER_NOT_FOUND;
         }
         // Then, check if the user has any posts
-        const totalPosts = await prisma.post.count({ where: { userId } });
+        const totalPosts = await prisma_1.prisma.post.count({ where: { userId } });
         if (totalPosts === 0) {
-            throw GetPostsError.NO_POSTS_FOUND;
+            throw post_types_1.GetPostsError.NO_POSTS_FOUND;
         }
         // Check if the requested page exists
         const totalPages = Math.ceil(totalPosts / limit);
         if (page > totalPages) {
-            throw GetPostsError.PAGE_BEYOND_LIMIT;
+            throw post_types_1.GetPostsError.PAGE_BEYOND_LIMIT;
         }
         // Fetch the posts
-        const posts = await prisma.post.findMany({
+        const posts = await prisma_1.prisma.post.findMany({
             where: { userId },
             orderBy: { createdAt: "desc" },
             skip,
@@ -53,30 +56,31 @@ export const GetAllPostsForUser = async (parameter) => {
     }
     catch (e) {
         console.error(e);
-        if (e === GetPostsError.USER_NOT_FOUND ||
-            e === GetPostsError.NO_POSTS_FOUND ||
-            e === GetPostsError.PAGE_BEYOND_LIMIT) {
+        if (e === post_types_1.GetPostsError.USER_NOT_FOUND ||
+            e === post_types_1.GetPostsError.NO_POSTS_FOUND ||
+            e === post_types_1.GetPostsError.PAGE_BEYOND_LIMIT) {
             throw e;
         }
-        throw GetPostsError.UNKNOWN;
+        throw post_types_1.GetPostsError.UNKNOWN;
     }
 };
-export const GetAllPosts = async (parameter) => {
+exports.GetAllPostsForUser = GetAllPostsForUser;
+const GetAllPosts = async (parameter) => {
     try {
         const { page, limit } = parameter;
         const skip = (page - 1) * limit;
         // Count total posts
-        const totalPosts = await prisma.post.count();
+        const totalPosts = await prisma_1.prisma.post.count();
         if (totalPosts === 0) {
-            throw GetPostsError.NO_POSTS_FOUND;
+            throw post_types_1.GetPostsError.NO_POSTS_FOUND;
         }
         // Check if the requested page exists
         const totalPages = Math.ceil(totalPosts / limit);
         if (page > totalPages) {
-            throw GetPostsError.PAGE_BEYOND_LIMIT;
+            throw post_types_1.GetPostsError.PAGE_BEYOND_LIMIT;
         }
         // Fetch all posts
-        const posts = await prisma.post.findMany({
+        const posts = await prisma_1.prisma.post.findMany({
             orderBy: { createdAt: "asc" },
             skip,
             take: limit,
@@ -93,31 +97,33 @@ export const GetAllPosts = async (parameter) => {
     }
     catch (e) {
         console.error(e);
-        if (e === GetPostsError.NO_POSTS_FOUND || e === GetPostsError.PAGE_BEYOND_LIMIT) {
+        if (e === post_types_1.GetPostsError.NO_POSTS_FOUND || e === post_types_1.GetPostsError.PAGE_BEYOND_LIMIT) {
             throw e;
         }
-        throw GetPostsError.UNKNOWN;
+        throw post_types_1.GetPostsError.UNKNOWN;
     }
 };
-export const deletePost = async (params) => {
+exports.GetAllPosts = GetAllPosts;
+const deletePost = async (params) => {
     try {
         // Check if the post belongs to the user
-        const post = await prisma.post.findUnique({
+        const post = await prisma_1.prisma.post.findUnique({
             where: { id: params.postId },
         });
         if (!post) {
-            return DeletePostError.POST_NOT_FOUND;
+            return post_types_1.DeletePostError.POST_NOT_FOUND;
         }
         if (post.userId !== params.userId) {
-            return DeletePostError.UNAUTHORIZED;
+            return post_types_1.DeletePostError.UNAUTHORIZED;
         }
-        await prisma.post.delete({
+        await prisma_1.prisma.post.delete({
             where: { id: params.postId },
         });
-        return DeletePostError.DELETE_SUCCESS;
+        return post_types_1.DeletePostError.DELETE_SUCCESS;
     }
     catch (error) {
         console.error(error);
-        return DeletePostError.DELETE_FAILED;
+        return post_types_1.DeletePostError.DELETE_FAILED;
     }
 };
+exports.deletePost = deletePost;
