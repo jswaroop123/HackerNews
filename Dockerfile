@@ -1,28 +1,25 @@
-# Use a stable Node.js version (LTS)
-FROM node:20
+# Use official Node.js image
+FROM node:22.1.0
 
-# Set the working directory
+# Set working directory
 WORKDIR /app
 
-# Copy package files first (improves Docker caching)
-COPY package*.json ./
-COPY tsconfig.json tsconfig.build.json ./
-COPY prisma ./prisma
+# Copy package files first for better caching
+COPY package.json package-lock.json ./
 
-# Install only production dependencies to reduce image size
-ENV NODE_ENV=production
-RUN npm ci --omit=dev
+# Install dependencies
+RUN npm install
 
-# Generate Prisma client if schema exists
-RUN test -f "./prisma/schema.prisma" && npx prisma generate || echo "Skipping prisma generate"
-
-# Copy the rest of the application files
+# Copy the rest of the project
 COPY . .
 
-# Compile TypeScript
+# Generate Prisma client if schema exists
+RUN test -f "./prisma/schema.prisma" && npx prisma generate || echo "No Prisma schema found"
+
+# Build the project
 RUN npm run build
 
-# Expose the necessary port
+# Expose the application port
 EXPOSE 3000
 
 # Start the application

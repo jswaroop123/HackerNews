@@ -1,5 +1,5 @@
 import { createMiddleware } from "hono/factory";
-import jwt from "jsonwebtoken";
+import Jwt from "jsonwebtoken";
 import { jwtSecretKey } from "../../../environment";
 
 //high-order function -> function having a function as a parameter which returns a function
@@ -15,7 +15,7 @@ export const tokenMiddleware = createMiddleware<{
   }
 
   try {
-    const payload = jwt.verify(token, jwtSecretKey) as jwt.JwtPayload;
+    const payload = Jwt.verify(token, jwtSecretKey) as Jwt.JwtPayload;
 
     const userId = payload.sub;
 
