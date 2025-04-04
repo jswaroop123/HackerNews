@@ -33,11 +33,11 @@ lerna-debug.log*
 # 5q~8Q~YwNMcCxWAW08FUQQ4FXC~GT-tKjqTKUccp value
 # 857b448e-8840-41e7-a2bb-decb53417fce secreatid
 
-# {
-#     "clientSecret":  "5q~8Q~YwNMcCxWAW08FUQQ4FXC~GT-tKjqTKUccp",
-#     "subscriptionId":  "d44a1b4c-1658-4036-95e1-b43fa02acc91",
-#     "tenantId":  "1fae8206-414a-4b5d-abc0-05e26c97536f",
-#     "clientId":  "b4ba75ca-7c57-4936-a125-07b527dde76f"
-# }
+{
+    "clientSecret":  "5q~8Q~YwNMcCxWAW08FUQQ4FXC~GT-tKjqTKUccp",
+    "subscriptionId":  "d44a1b4c-1658-4036-95e1-b43fa02acc91",
+    "tenantId":  "1fae8206-414a-4b5d-abc0-05e26c97536f",
+    "clientId":  "b4ba75ca-7c57-4936-a125-07b527dde76f"
+}
 
 # {"clientSecret":"5q~8Q~YwNMcCxWAW08FUQQ4FXC~GT-tKjqTKUccp","subscriptionId":"d44a1b4c-1658-4036-95e1-b43fa02acc91","tenantId":"1fae8206-414a-4b5d-abc0-05e26c97536f","clientId":"b4ba75ca-7c57-4936-a125-07b527dde76f"}
