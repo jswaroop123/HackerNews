@@ -27,7 +27,7 @@ jobs:
       - name: Azure Login
         uses: azure/login@v2
         with:
-          creds: ${{ secrets.AZURE_GITHUB_ACTIONS }}
+          creds: ${{ secrets.GITHUBACTIONS1SI22IS401}}
 
       # INFRA ENSURE BLOCKS
       - name: Check Resource Group exists
@@ -150,6 +150,6 @@ jobs:
             --registry-username "${{ env.ACR_USERNAME }}" \
             --registry-password "${{ env.ACR_PASSWORD }}" \
             --env-vars \
-                SECRET_KEY=${{ secrets.SECRET_KEY }} \
+                KEY=${{ secrets.KEY }} \
                 DATABASE_URL=${{ secrets.DATABASE_URL }} \
                 DIRECT_URL=${{ secrets.DIRECT_URL }}
