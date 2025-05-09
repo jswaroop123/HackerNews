@@ -70,7 +70,6 @@ postsRoutes.get("/me", tokenMiddleware, async (context) => {
     return context.json({ error: "Unknown error" }, 500);
   }
 });
-
 postsRoutes.get("/all", async (context) => {
   try {
     const { page, limit } = getPagination(context);
