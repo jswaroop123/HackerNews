@@ -1,20 +1,20 @@
 import { Hono } from "hono";
 import { tokenMiddleware } from "./middleware/token-middleware";
-import {
-  createPost} from "../controllers/posts/post-controllers";
+import {createPost} from "../controllers/posts/post-controllers";
 import {
   DeletePostError,
   GetPostsError,
   PostStatus,
 } from "../controllers/posts/post-types";
-
+import { sessionMiddleware } from "./middleware/session-middleware";
 import { getPagination } from "../extras/pagination";
 import {GetAllPostsForUser, GetAllPosts, deletePost} from "../controllers/posts/post-controllers"
 
 export const postsRoutes = new Hono();
-postsRoutes.post("/create", tokenMiddleware, async (context) => {
+
+postsRoutes.post("/", sessionMiddleware, async (context) => {
   try {
-    const userId = context.get("userId"); //From tokenMiddleware
+    const userId = context.get("user").id; //From tokenMiddleware
     if (!userId) {
       return context.json({ error: "Unauthorized" }, 401);
     }
@@ -70,7 +70,8 @@ postsRoutes.get("/me", tokenMiddleware, async (context) => {
     return context.json({ error: "Unknown error" }, 500);
   }
 });
-postsRoutes.get("/all", async (context) => {
+
+postsRoutes.get("/", async (context) => {
   try {
     const { page, limit } = getPagination(context);
 

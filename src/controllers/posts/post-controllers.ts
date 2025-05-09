@@ -107,18 +107,20 @@ export const createPost = async (parameters: {
   
       // Fetch all posts
       const posts = await prisma.post.findMany({
-        orderBy: { createdAt: "asc" }, 
+        orderBy: { createdAt: "asc" },
         skip,
         take: limit,
         include: {
           user: {
             select: {
-              name:true,
+              name: true,
               username: true,
             },
           },
+          // Removed the 'content' field as it is not valid
         },
       });
+      
   
       return { posts };
     } catch (e) {
@@ -160,6 +162,3 @@ export const deletePost = async (params: {
     return DeletePostError.DELETE_FAILED;
   }
 };
-
-
-
