@@ -1,15 +1,20 @@
 import { betterAuth } from "better-auth";
-import { betterAuthSecret, serverUrl, webClientUrl } from "../../../environment";
+import { betterAuthSecret, serverUrl, webClientUrl } from "../../environment";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { prismaClient } from "./prisma";
 import { username } from "better-auth/plugins";
-import { prismaClient } from "../prisma";
 
-
-const betterAuthServerClient = betterAuth({
+const auth = betterAuth({
   baseURL: serverUrl,
+  basePath: "/authentications",
   trustedOrigins: [webClientUrl],
-  secret: betterAuthSecret,
-  plugins:[ username() ],
+  advanced: {
+    defaultCookieAttributes: {
+      sameSite: "none",
+      secure: true,
+      partitioned: true,
+    },
+  },
   database: prismaAdapter(prismaClient, {
     provider: "postgresql",
   }),
@@ -18,6 +23,10 @@ const betterAuthServerClient = betterAuth({
   },
   session: {
     modelName: "Session",
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60,
+    },
   },
   account: {
     modelName: "Account",
@@ -27,7 +36,10 @@ const betterAuthServerClient = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
-  }
+  },
+  cookies: {
+    enabled: true,
+  },
 });
 
-export default betterAuthServerClient;
+export default auth;
